@@ -15,11 +15,13 @@ exports.sendVerificationEmail = async (pubSubEvent, context) => {
     : '{}';
   const userData = JSON.parse(message);
  
-  const { email } = userData;
-  const {token} = userData;
+  // const { email } = userData;
+  // const {token} = userData;
+  // const expiryTime = Date.now() + 2 * 60 * 1000;
+// const verificationLink = `http://santoshicloud.me:3000/verify?token=${token}`;
+  const { email, verificationLink } = userData;
   const expiryTime = Date.now() + 2 * 60 * 1000;
-const verificationLink = `http://santoshicloud.me:3000/verify?token=${token}`;
- 
+
   const emailData = {
     from: 'postmaster@mg.santoshicloud.me',
     to: email, // Assuming 'email' is the email address
@@ -54,12 +56,12 @@ async function updateEmailSentStatus(email, verificationToken, expiryTime) {
 
   const User = sequelize.define('User', {
     id: {
-      type: DataTypes.UUID,
-      primaryKey: true,
-      defaultValue: DataTypes.UUIDV4,
+      type: Sequelize.UUID, // Use UUID data type for id
+      defaultValue: Sequelize.UUIDV4, // Generate UUID by default
+      primaryKey: true, // Make id the primary key
     },
     email: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
       unique: true,
       validate: {
@@ -67,7 +69,7 @@ async function updateEmailSentStatus(email, verificationToken, expiryTime) {
       },
     },
     password: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
     },
     firstName: {
@@ -75,28 +77,30 @@ async function updateEmailSentStatus(email, verificationToken, expiryTime) {
       allowNull: false,
     },
     lastName: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
     },
     account_created: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      type: Sequelize.DATE,
+      allowNull: false,
+        aqdefaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
     },
     account_updated: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      type: Sequelize.DATE,
+      allowNull: true, // Allow null initially
     },
     isEmailVerified: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,  
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+      field: 'is_email_verified'
     },
-    mailSentAt : {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+    mailSentAt: {
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.NOW,
     },
-    verificationLink : {
-      type: DataTypes.STRING,
-      defaultValue:false
+    verificationLink: {
+      type: Sequelize.STRING,
+      defaultValue: null  // Changed from false to null
     }
   }, {
     timestamps: false,
